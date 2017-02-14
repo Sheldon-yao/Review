@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <!--添加字体图标文件样式-->
+  <link rel="stylesheet" href="./css/font-awesome.css">
+  <link rel="stylesheet" href="./css/css.css">
+</head>
+
+<body>
+  <h3 class="playerTitle">视频播放器</h3>
+  <div class="player">
+    <video src="./mp3/test.mp4"></video>
+    <div class="controls">
+      <a href="javascript:;" class="switch fa fa-play"></a>
+      <a href="javascript:;" class="expand fa fa-expand"></a>
+      <div class="progress">
+        <div class="bar"></div>
+        <div class="loaded"></div>
+        <div class="elapse"></div>
+      </div>
+      <div class="time">
+        <span class="currentTime">00:00:00</span> \
+        <span class="totalTime">00:00:00</span>
+      </div>
+    </div>
+  </div>
+  <!-- <script src="./js/jquery.min.js"></script> -->
+  <script>
+    var myVideo=document.querySelector('video');
+    var mySwitch=document.querySelector('.switch');
+    // 为播放/暂停按钮添加点击事件
+    mySwitch.addEventListener('click', function(){
+      if(myVideo.paused){
+        myVideo.play();
+        mySwitch.classList.remove('.fa-play');
+        mySwitch.classList.add("fa-pause");
+      }else{
+        myVideo.pause();
+        mySwitch.classList.remove("fa-pause");
+        mySwitch.classList.add("fa-play");
+      }
+    }, false);
+    // 设置全屏
+    var expand=document.querySelector('.expand');
+    expand.addEventListener('click',function(){
+      if(myVideo.webkitRequestFullScreen){
+        myVideo.webkitRequestFullScreen();
+      }else if(myVideo.requestFullScreen){
+        myVideo.requestFullScreen();
+      }else if(myVideo.mozRequestFullScreen){
+        myVideo.mozRequestFullScreen();
+      }else if(myVideo.oRequestFullScreen){
+        myVideo.oRequestFullScreen();
+      }
+    },false);
+    // 当视频可以进行播放的时候，会触发oncanplay事件
+    myVideo.addEventListener('canplay',function(){
+      // 让视频显示出来
+      setTimeout(function(){
+        myVideo.style.display="block";
+        // 获取视频的总时间
+        var totalTime=myVideo.duration;
+        document.querySelector('.totalTime').innerHTML=getTime(totalTime) ;
+      }, 2000);
+    },false);
+    // 设置播放的时间，播放时，会触发ontimeupdate事件
+    myVideo.addEventListener('timeupdate',function(){
+      // 获取当前播放的时间
+      var currentTime = myVideo.currentTime;
+      document.querySelector('.currentTime').innerHTML=getTime(currentTime);
+      // 模拟进度条
+      document.querySelector(".elapse").style.width=currentTime/myVideo.duration*100+"%";
+    },false);
+    function getTime(time){
+      var hour=~~(time/3600);
+      var minute=~~(time%3600/60);
+      var second=~~(time%60);
+      hour=hour<10?'0'+hour:hour;
+      minute=minute<10?'0'+minute:minute;
+      second=second<10?'0'+second:second;
+      return hour+":"+minute+":"+second;
+    }
+  </script>
+</html>

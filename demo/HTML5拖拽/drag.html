@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <style>
+  div {
+    width: 200px;
+    height: 300px;
+    float: left;
+    border: 1px solid #0af;
+    margin-right: 200px;
+  }
+  </style>
+</head>
+
+<body>
+  <div class="div1">
+    <!--draggable="true":说明可以拖动 false:说明不能进行拖动-->
+    <p draggable="true" id="p1">把我拖动吧</p>
+    <p draggable="true" id="p2">也把我拖动吧</p>
+    <p draggable="true" id="p3">别动我</p>
+  </div>
+  <div class="div2"></div>
+  <div class="div3"></div>
+  <script>
+  // 开始拖拽
+  document.addEventListener('dragstart', function(e) {
+    // 设置当前目标元素的透明度，产生拖拽效果
+    getEventTarget(e).style.opacity = 0.4;
+    // 将当前的被拖拽元素的id号存储到事件源对象中
+    e.dataTransfer.setData("key", e.target.id);
+
+  });
+  // 拖拽进行中
+  document.addEventListener('drag', function(e) {
+    getEventTarget(e).parentNode.style.borderColor = 'blue';
+  });
+  // 拖拽结束
+  document.addEventListener('dragend', function(e) {
+    getEventTarget(e).style.opacity = 1;
+    getEventTarget(e).parentNode.style.borderColor = 'red';
+  });
+  // 下面几个方法的事件源是目标元素，而不是拖拽的元素
+  // 将当前元素拖拽到另一个元素上时触发
+  document.addEventListener('dragenter', function(e) {
+    if (getEventTarget(e).className == 'div2') {
+      getEventTarget(e).style.borderColor = 'pink';
+    } else if (getEventTarget(e).className == 'div1') {
+      getEventTarget(e).style.borderColor = 'red';
+    }
+  });
+  // 拖拽元素在目标元素上移动时触发
+  document.addEventListener('dragover', function(e) {
+    // 默认情况下，一个元素不能拖拽到另一个元素内，如果想允许拖拽，必须阻止默认的冒泡事件
+    e = e || window.event;
+    e.preventDefault();
+    e.stopPropagation();
+  });
+  // 当拖拽元素离开目标元素时触发
+  document.addEventListener('dragleave', function(e) {
+    getEventTarget(e).style.borderColor = 'blue';
+  });
+  // 当拖拽元素在目标元素上松开时触发
+  document.addEventListener('drop', function(e) {
+    // 获取被拖拽的元素
+    var id = e.dataTransfer.getData("key");
+    // 追加被拖拽元素到目标元素
+    getEventTarget(e).appendChild(document.getElementById(id));
+  });
+  // 处理事件对象以及目标元素
+  function getEventTarget(e) {  
+　　e = e || window.event;  
+　　return e.target || e.srcElement;  
+  }  
+  </script>
+</body>
+
+</html>
