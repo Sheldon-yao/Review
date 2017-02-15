@@ -253,3 +253,125 @@ if(XMLHttpRequest){
     - 优点：不再关注参数的顺序，方便参数类型和顺序的扩展
     - 缺点：暴露在文件中，如果有新的功能需要添加，会产生麻烦，不方便扩展
 4. 使用命名空间
+```
+/**
+ * [$ 该对象是一个命名空间]
+ */
+ var $={
+   /**
+    * [getPara 拼接参数]
+    * @param  {[type]} data [要进行拼接的对象]
+    * @return {[type]}      [拼接好的结果]
+    */
+   getPara:function(data){
+     var result='?';
+     for(var key in data){
+       result=result+key+'='+data[key]+'&';
+     }
+     return result.slice(0,-1);
+   },
+   /**
+    * [ajax 封装的AJAX函数]
+    * @param  {[type]} obj [传入的参数对象]
+    * @return {[type]}     [ajax对象]
+    */
+   ajax:function(obj){
+     // 对传入的obj对象进行判断
+     if(!obj||typeof obj!='object'){
+       return false;
+     }
+     // method初始化
+     var type=obj.type || 'get';
+     // 请求url初始化
+     var url=obj.url || location.pathname;
+     // 数据初始化
+     var data=obj.data || {};
+     // 参数拼接
+     data=this.getPara(data);
+     // 成功回调
+     var success=obj.success;
+ 
+     var xhr=new XMLHttpRequest();
+     // get方式通过url传递数据
+     if(type=='get'){
+       url+=data;
+       data=null;
+     }
+     // 创建请求
+     xhr.open(type,url);
+     // 如果是post，需要设置请求头格式
+     if(type=='post'){
+       xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+     }
+     // 监听状态改变事件
+     xhr.addEventListener('readystatechange', function(){
+       if(xhr.status==200&&xhr.readyState==4){
+         var result='';
+         var ct=xhr.getResponseHeader('Content-Type');
+         // 数据格式判断
+         if(ct.indexOf('xml')!=-1){
+           result=xhr.responseXML;
+         }else if(ct.indexOf('json')!=-1){
+           result=JSON.parse(xhr.responseText);
+         }
+         success(result);
+       }
+     });
+     // 发送请求
+     xhr.send(data);
+   }
+ };
+ /*调用*/
+ $.ajax({
+   type:'get',
+   url:'list.php',
+   data:{"name":"admin","age":"20"},
+   success:function(data){
+     var html='';
+     for(var i=0;i<data.length;i++){
+       var item=data[i];
+       html+="<li>";
+       html+="<img src='"+item.src+"'/>";
+       html+="<p>"+item.name+"</p>";
+       html+="</li>";
+     }
+     document.getElementById("nav").innerHTML=html;
+   }
+ });
+```
+
+### jQuery
+1. $.ajax({}) 可配置方式发起Ajax请求
+  - url :接口地址
+  - type :请求方式(get/post)
+  - timeout : 要求为Number类型的参数，设置请求超时时间（毫秒）
+  - dataType: 服务器返回格式
+  - data: 发送请求数据
+  - beforeSend: 要求为Function类型的参数，发送请求前可以修改XMLHttpRequest对象的函数，例如添加自定义HTTP头。在beforeSend中如果返回false可以取消本次ajax请求
+  - success: 成功响应后调用
+  - error: 错误响应时调用
+  - complete: 响应完成时调用（包括成功和失败）
+2. $.get() 以GET方式发起Ajax请求
+3. $.post() 以POST方式发起Ajax请求
+4. $('form').serialize() 序列化表单（即格式化key=val&key=val）
+
+### [jQuery的AJAX案例](../demo/AJAX注册/register.html)
+
+### jQuery对象与DOM对象之间的转换方法
+1. jQuery对象转成DOM对象
+  - jQuery对象是一个数据对象，可以通过[index]的方法，来得到相应的DOM对象
+  ```
+  var $v =$("#v") ; //jQuery对象
+  var v=$v[0]; //DOM对象
+  ```
+  - jQuery本身提供，通过.get(index)方法，得到相应的DOM对象
+  ```
+  var $v=$("#v"); //jQuery对象
+  var v=$v.get(0); //DOM对象
+  ```
+2. DOM对象转成jQuery对象
+  - 用$()把DOM对象包装起来
+  ```
+  var v=document.getElementById("v"); //DOM对象
+  var $v=$(v); //jQuery对象
+  ```
